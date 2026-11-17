@@ -38,4 +38,4 @@ def test_dashboard_files_and_preloaded_bundle_exist() -> None:
     assert (BASE_DIR / "dashboard" / "app.js").exists()
     assert (BASE_DIR / "dashboard" / "menubar.js").exists()
     assert (BASE_DIR / "output" / "presupuesto_data.js").exists()
-    assert (BASE_DIR / "output" / "presupuesto.db").exists()
+    assert (BASE_DIR / "dashboard" / "presupuesto_data.js").exists()
