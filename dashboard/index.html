@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0d131f" />
+  <meta name="color-scheme" content="dark light" />
+  <title>ARQMED — Editor Universal FIEBDC-3 (.BC3)</title>
+  <link rel="icon" href="assets/logo/favicon.ico" sizes="48x48" />
+  <link rel="icon" href="assets/logo/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="assets/logo/apple-touch-icon.png" />
+  <link rel="manifest" href="assets/logo/site.webmanifest" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <div id="dropOverlay" class="drop-overlay" role="dialog" aria-label="Cargar archivo BC3">
+    <div class="drop-box">
+      <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
+        stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent)" aria-hidden="true">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <polyline points="17 8 12 3 7 8" />
+        <line x1="12" y1="3" x2="12" y2="15" />
+      </svg>
+      <div style="font-size:18px;font-weight:700;">Suelta aquí cualquier archivo .BC3</div>
+      <div style="font-size:13px;color:var(--text-secondary);">Se normalizará al instante sin importar el nombre o nivel
+        de sus capítulos</div>
+    </div>
+  </div>
+
+    <div id="impactModalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true"
+    aria-labelledby="impactModalTitle">
+    <div class="impact-modal">
+      <div class="impact-modal-header">
+        <h2 id="impactModalTitle">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent)" aria-hidden="true">
+            <path d="M12 20h9" />
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+          </svg>
+          <span id="impactModalTitleText">Inspector de Edición e Impacto en Presupuesto</span>
+        </h2>
+        <button type="button" id="btnCloseImpactModal" class="btn-action" aria-label="Cerrar asistente">✕
+          Cerrar</button>
+      </div>
+
+      <div class="impact-modal-body">
+                <div id="impactEditFieldsWrap" class="edit-form-grid">
+          <div class="form-field">
+            <label for="editFieldCode">Código BC3</label>
+            <input id="editFieldCode" type="text" class="form-input mono" readonly />
+          </div>
+          <div class="form-field">
+            <label for="editFieldUnit">Unidad</label>
+            <input id="editFieldUnit" type="text" class="form-input mono" />
+          </div>
+          <div class="form-field">
+            <label for="editFieldSummary">Resumen / Descripción Corta</label>
+            <input id="editFieldSummary" type="text" class="form-input" />
+          </div>
+          <div class="form-field">
+            <label for="editFieldYield">Cant. / Rend. Local</label>
+            <input id="editFieldYield" type="number" step="any" class="form-input mono" />
+          </div>
+          <div class="form-field">
+            <label for="editFieldPrice">Precio Unit. (€)</label>
+            <input id="editFieldPrice" type="number" step="any" class="form-input mono" />
+          </div>
+        </div>
+
+                <div class="impact-sim-strip">
+          <div class="sim-card">
+            <div class="k">Presupuesto Actual</div>
+            <div id="simOldTotal" class="v">—</div>
+          </div>
+          <div class="sim-card">
+            <div class="k">Nuevo Presupuesto (según OK)</div>
+            <div id="simNewTotal" class="v" style="color:var(--accent);">—</div>
+          </div>
+          <div class="sim-card">
+            <div class="k">Impacto Total Obra (Δ €)</div>
+            <div id="simDeltaTotal" class="v">—</div>
+          </div>
+          <div class="sim-card">
+            <div class="k">Apariciones Aprobadas (OK)</div>
+            <div id="simApprovedCount" class="v">—</div>
+          </div>
+        </div>
+
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+          <div style="font-size:12px;color:var(--text-secondary);" id="impactScopeSubtitle">
+            Revisa dónde interviene este concepto y marca <strong>OK</strong> o <strong>NO</strong> en cada partida
+            afectada:
+          </div>
+          <div id="impactBulkButtons" style="display:flex;gap:6px;">
+            <button type="button" id="btnAllOk" class="lvl-pill" style="border-color:#10b981;color:#10b981;">✓ Marcar
+              Todas OK</button>
+            <button type="button" id="btnOnlyCurrentOk" class="lvl-pill">🎯 Solo Fila Actual OK</button>
+            <button type="button" id="btnAllNo" class="lvl-pill" style="border-color:#ef4444;color:#ef4444;">✕ Marcar
+              Todas NO</button>
+          </div>
+        </div>
+
+                <div style="border:1px solid var(--border-default);border-radius:8px;overflow:auto;max-height:340px;">
+          <table class="grid-table">
+            <thead>
+              <tr>
+                <th style="width:125px;">Decisión</th>
+                <th style="width:110px;">Rol</th>
+                <th>Ruta en Obra (Capítulo › Subcapítulo › Partida)</th>
+                <th class="num" style="width:95px;">Cant. Obra</th>
+                <th class="num" style="width:115px;">Imp. Antes (€)</th>
+                <th class="num" style="width:115px;">Imp. Nuevo (€)</th>
+                <th class="num" style="width:115px;">Diferencia (Δ €)</th>
+              </tr>
+            </thead>
+            <tbody id="impactOccurrencesBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="impact-modal-footer">
+        <div style="font-size:11.5px;color:var(--text-secondary);" id="impactFooterNote">
+          Las filas marcadas con <strong>NO</strong> conservarán su valor original intacto.
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button type="button" id="btnRejectModalNo" class="btn-cancel-no">✕ Cancelar Todo (NO)</button>
+          <button type="button" id="btnConfirmModalOk" class="btn-confirm-ok">✓ Aplicar Cambios Aprobados (OK)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <div id="projectsModalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true"
+    aria-labelledby="projectsModalTitle">
+    <div class="impact-modal" style="max-width:860px;">
+      <div class="impact-modal-header">
+        <h2 id="projectsModalTitle">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent)" aria-hidden="true">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+          </svg>
+          <span>Mis Presupuestos .BC3 Guardados en este Dispositivo</span>
+        </h2>
+        <button type="button" id="btnCloseProjectsModal" class="btn-action" aria-label="Cerrar gestor de archivos">✕
+          Cerrar</button>
+      </div>
+
+      <div class="impact-modal-body">
+        <div class="local-storage-banner">
+          <div>
+            <strong>🔒 Almacenamiento 100% Local y Privado (IndexedDB)</strong>
+            <div style="font-size:11.5px;color:var(--text-secondary);margin-top:2px;">
+              Todos los archivos <code>.bc3</code> que abras y cada cambio que apruebes se guardan automáticamente en la
+              memoria local de tu navegador, únicamente para ti en este dispositivo.
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;">
+            <label for="bc3FileInput" class="btn-confirm-ok" style="cursor:pointer;">
+              + Importar Archivo(s) .BC3
+            </label>
+            <button type="button" id="btnDuplicateActiveProject" class="btn-action">
+              ⎘ Duplicar Actual
+            </button>
+          </div>
+        </div>
+
+        <div id="projectsCardsContainer" class="projects-cards-grid"></div>
+      </div>
+
+      <div class="impact-modal-footer">
+        <div style="font-size:11.5px;color:var(--text-secondary);" id="localStorageStatsText">
+          Guardado automático activo en este navegador.
+        </div>
+        <button type="button" id="btnResetFactoryProject" class="lvl-pill"
+          title="Restaurar el presupuesto base original sin borrar tus otros archivos .bc3">
+          ↺ Restaurar Presupuesto Base Original
+        </button>
+      </div>
+    </div>
+  </div>
+
+    <header class="topbar">
+    <div class="brand-cluster">
+      <button type="button" id="btnMobileMenu" class="mobile-menu-btn" aria-label="Abrir menú principal"
+        aria-controls="mobileMenuSheet" aria-expanded="false">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
+      <div class="brand-mark" title="ARQMED · Editor Universal FIEBDC-3">
+        <svg width="18" height="18" viewBox="0 0 256 256" fill="none" aria-hidden="true">
+          <path fill="currentColor" d="M24 24 H140 L172 56 H60 V200 H172 L140 232 H24 Z" />
+          <path fill="var(--text-tertiary)" d="M96 76 H232 V104 H96 Z" />
+          <path fill="var(--accent)" d="M136 114 H232 V142 H136 Z" />
+          <path fill="var(--text-tertiary)" d="M96 152 H232 V180 H96 Z" />
+        </svg>
+        <span>ARQM<span style="color:var(--accent);">E</span>D</span>
+      </div>
+      <div class="project-identity">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <h1 id="projectTitle" class="project-title">Cargando presupuesto...</h1>
+          <span id="localSaveBadge" class="local-save-pill"
+            title="Todos los cambios se guardan automáticamente en este dispositivo">✓ Local</span>
+        </div>
+        <div id="projectSubtitle" class="project-meta"></div>
+      </div>
+    </div>
+
+    <nav class="mode-switcher" role="tablist" aria-label="Modos de visualización">
+      <button class="mode-btn active" role="tab" aria-selected="true" data-view="arqmed">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 3v18h18" />
+          <path d="M7 14h4" />
+          <path d="M7 9h8" />
+          <path d="M7 19h12" />
+        </svg>
+        <span>Editor árbol</span>
+      </button>
+      <button class="mode-btn" role="tab" aria-selected="false" data-view="matrix">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <line x1="3" y1="9" x2="21" y2="9" />
+          <line x1="3" y1="15" x2="21" y2="15" />
+          <line x1="9" y1="3" x2="9" y2="21" />
+          <line x1="15" y1="3" x2="15" y2="21" />
+        </svg>
+        <span>Matriz Multi-Nivel</span>
+      </button>
+      <button class="mode-btn" role="tab" aria-selected="false" data-view="analytics">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="18" y1="20" x2="18" y2="10" />
+          <line x1="12" y1="20" x2="12" y2="4" />
+          <line x1="6" y1="20" x2="6" y2="14" />
+        </svg>
+        <span>Dashboard de Obra</span>
+      </button>
+    </nav>
+
+    <div class="toolbar-actions">
+      <div class="project-quick-bar">
+        <select id="projectSwitcherSelect" class="filter-select project-switcher-select"
+          aria-label="Cambiar de archivo BC3 activo" title="Elegir qué archivo .BC3 guardado usar ahora"></select>
+        <button type="button" id="btnOpenProjectsModal" class="btn-action legacy-hidden"
+          title="Gestionar todos mis archivos .BC3 guardados localmente">
+          <span>📚 Mis .BC3</span>
+        </button>
+      </div>
+
+            <button id="btnUndo" class="btn-action legacy-hidden" disabled title="Deshacer último cambio aprobado (Ctrl+Z)"
+        style="opacity:0.5;">
+        <span>↩ Deshacer (0)</span>
+      </button>
+
+      <label class="btn-action legacy-hidden" for="bc3FileInput"
+        title="Importar unoF o varios archivos .bc3 a tu biblioteca local">
+        <span>📂 + .BC3</span>
+      </label>
+      <input id="bc3FileInput" type="file" accept=".bc3,.txt" multiple style="display:none" />
+
+      <button id="btnExportBc3" class="btn-action primary legacy-hidden"
+        title="Descargar el archivo .BC3 con todos los cambios aplicados">
+        <span>💾 Guardar .BC3</span>
+      </button>
+
+      <button id="btnExportCsv" class="btn-action legacy-hidden"
+        title="Exportar matriz multi-nivel actualizada a CSV (Excel)">
+        <span>📥 CSV</span>
+      </button>
+
+      <button id="btnTheme" class="btn-action legacy-hidden" aria-label="Alternar tema claro u oscuro"
+        title="Alternar tema claro/oscuro">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="5" />
+          <line x1="12" y1="1" x2="12" y2="3" />
+          <line x1="12" y1="21" x2="12" y2="23" />
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+          <line x1="1" y1="12" x2="3" y2="12" />
+          <line x1="21" y1="12" x2="23" y2="12" />
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+        </svg>
+      </button>
+    </div>
+  </header>
+
+    <nav id="appMenubar" class="app-menubar" role="menubar" aria-label="Menú principal"></nav>
+
+    <section id="view-arqmed" class="view-section active" role="tabpanel">
+    <div class="subtoolbar">
+      <button type="button" id="btnMobileDrawerToggle" class="lvl-pill mobile-drawer-trigger"
+        title="Abrir menú de paneles activos">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <line x1="9" y1="3" x2="9" y2="21" />
+        </svg>
+        <span>Paneles</span>
+      </button>
+
+      <div class="search-wrapper">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input id="treeSearchInput" type="search" class="search-input" aria-label="Buscar en el árbol del presupuesto"
+          placeholder="Buscar por código, capítulo, partida o recurso..." />
+        <span id="searchShortcutBadge" class="search-shortcut">Ctrl+K</span>
+      </div>
+
+      <div id="activeBreadcrumb" class="breadcrumb-trail" aria-label="Ruta jerárquica del nodo activo"></div>
+    </div>
+
+    <div class="arqmed-body-shell">
+      <div id="sideDockBackdrop" class="side-dock-backdrop" aria-hidden="true"></div>
+
+            <aside id="sidePanelDock" class="side-panel-dock collapsed" aria-label="Menú lateral de vista rápida">
+        <div class="side-dock-header">
+          <span class="side-dock-title">Vista Rápida</span>
+          <button type="button" id="btnToggleSideDock" class="side-dock-collapse-btn"
+            title="Contraer / Expandir menú lateral">
+            ▶
+          </button>
+        </div>
+
+        <div class="side-dock-body">
+          <div class="side-dock-section-label">Módulos (clic para mostrar / minimizar)</div>
+
+          <button type="button" class="side-dock-item active" data-dock-toggle="descomposicion"
+            title="Mostrar o minimizar Descomposición">
+            <span class="side-dock-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="16 18 22 12 16 6" />
+                <polyline points="8 6 2 12 8 18" />
+              </svg>
+            </span>
+            <span class="side-dock-text">
+              <strong>Descomposición</strong>
+              <small>Recursos y rendimientos</small>
+            </span>
+            <span class="side-dock-state" data-dock-badge="descomposicion">VISIBLE</span>
+          </button>
+
+          <button type="button" class="side-dock-item active" data-dock-toggle="mediciones"
+            title="Mostrar o minimizar Mediciones">
+            <span class="side-dock-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="16" rx="2" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+                <line x1="9" y1="4" x2="9" y2="20" />
+              </svg>
+            </span>
+            <span class="side-dock-text">
+              <strong>Mediciones</strong>
+              <small>Uds · Long · Anch · Alt</small>
+            </span>
+            <span class="side-dock-state" data-dock-badge="mediciones">VISIBLE</span>
+          </button>
+
+          <button type="button" class="side-dock-item" data-dock-toggle="pliego"
+            title="Mostrar o minimizar Comentario / Pliego (~T)">
+            <span class="side-dock-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+              </svg>
+            </span>
+            <span class="side-dock-text">
+              <strong>Comentario / Pliego</strong>
+              <small>Texto descriptivo (~T)</small>
+            </span>
+            <span class="side-dock-state" data-dock-badge="pliego">MINIMIZADO</span>
+          </button>
+
+          <div class="side-dock-divider"></div>
+          <div class="side-dock-section-label">Combinaciones Rápidas</div>
+
+          <div class="side-dock-presets">
+            <button type="button" class="dock-preset-btn" data-dock-preset="pliego,mediciones">
+              Solo Pliego y Mediciones
+            </button>
+            <button type="button" class="dock-preset-btn" data-dock-preset="descomposicion,mediciones">
+              Descomp. y Mediciones
+            </button>
+            <button type="button" class="dock-preset-btn" data-dock-preset="descomposicion,pliego">
+              Descomp. y Pliego
+            </button>
+            <button type="button" class="dock-preset-btn" data-dock-preset="descomposicion,mediciones,pliego">
+              Mostrar los 3 Paneles
+            </button>
+            <button type="button" class="dock-preset-btn" data-dock-preset="none">
+              Minimizar Todo (Solo Árbol)
+            </button>
+          </div>
+
+          <div class="side-dock-divider"></div>
+          <div class="side-dock-section-label">Tamaño y Orden de Filas</div>
+
+          <div class="side-tree-Size-group">
+            <span style="font-size:10.5px;color:var(--text-secondary);">Altura de fila:</span>
+            <div class="row-density-pills">
+              <button type="button" class="lvl-pill" data-row-density="sm" title="Filas compactas">S</button>
+              <button type="button" class="lvl-pill active" data-row-density="md"
+                title="Filas tamaño estándar">M</button>
+              <button type="button" class="lvl-pill" data-row-density="lg" title="Filas grandes">L</button>
+              <button type="button" class="lvl-pill" data-row-density="xl" title="Filas extra grandes">XL</button>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:5px;">
+            <button type="button" id="btnMoveRowUp" class="dock-preset-btn" style="flex:1;text-align:center;"
+              title="Intercambiar fila seleccionada con la anterior">
+              ↑ Subir Fila
+            </button>
+            <button type="button" id="btnMoveRowDown" class="dock-preset-btn" style="flex:1;text-align:center;"
+              title="Intercambiar fila seleccionada con la siguiente">
+              ↓ Bajar Fila
+            </button>
+          </div>
+
+          <label class="side-check-row"
+            title="En FIEBDC-3 el símbolo # indica Capítulo, pero se oculta para ver el código limpio">
+            <input type="checkbox" id="chkHideHashSymbol" checked />
+            <span>Ocultar <code>#</code> técnico en códigos</span>
+          </label>
+
+          <div class="side-dock-divider"></div>
+          <div class="side-dock-section-label">Mostrar / Ocultar Filas por Tipo</div>
+          <div id="sideRoleVisibilityList" class="side-role-vis-grid">
+            <button type="button" class="role-vis-chip active" data-vis-role="CAPITULO">Capítulos</button>
+            <button type="button" class="role-vis-chip active" data-vis-role="PARTIDA">Partidas</button>
+            <button type="button" class="role-vis-chip active" data-vis-role="MANO_OBRA">M. Obra</button>
+            <button type="button" class="role-vis-chip active" data-vis-role="MATERIAL">Materiales</button>
+            <button type="button" class="role-vis-chip active" data-vis-role="OTHER">Maq. / Aux.</button>
+          </div>
+
+          <div class="side-dock-divider"></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:0 4px;">
+            <div class="side-dock-section-label" style="padding:0;">Columnas del Árbol (Orden / Ancho)</div>
+            <button type="button" id="btnResetTreeCols" class="lvl-pill" style="padding:1px 5px;font-size:9.5px;"
+              title="Restaurar orden y tamaño de columnas">↺ Reset</button>
+          </div>
+          <div id="sideTreeColumnsList" class="side-cols-list"></div>
+        </div>
+      </aside>
+
+      <div id="arqmedWorkspace" class="arqmed-workspace">
+                <div id="treePane" class="tree-pane" tabindex="0" aria-label="Árbol jerárquico del presupuesto">
+          <table class="grid-table" id="arqmedTreeTable">
+            <thead id="arqmedTreeHead">
+              <tr>
+                <th style="width: 235px;">Código Jerárquico</th>
+                <th style="width: 118px;">Naturaleza / Nivel</th>
+                <th style="width: 55px;">Ud</th>
+                <th>Resumen del Concepto</th>
+                <th class="num" style="width: 105px;">Cantidad</th>
+                <th class="num" style="width: 105px;">Coste</th>
+                <th class="num" style="width: 122px;">Importe</th>
+                <th class="num" style="width: 120px;">Peso Obra</th>
+                <th class="num" style="width: 84px;">Editar</th>
+              </tr>
+            </thead>
+            <tbody id="arqmedTreeBody"></tbody>
+          </table>
+        </div>
+
+                <div id="resizerH" class="resizer-h" title="Arrastra para redimensionar la altura del árbol"></div>
+
+                <div id="bottomWorkspace" class="bottom-workspace">
+                    <div id="dockPane-descomposicion" class="dockable-pane" data-pane-id="descomposicion">
+            <div class="pane-header">
+              <span class="pane-header-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="16 18 22 12 16 6" />
+                  <polyline points="8 6 2 12 8 18" />
+                </svg>
+                <span id="decompHeaderTitle">Descomposición</span>
+              </span>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <button type="button" id="btnAddChildNode" class="lvl-pill"
+                  style="border-color:var(--accent);color:var(--accent);">+ Añadir Recurso</button>
+                <span id="decompCountBadge"
+                  style="color:var(--text-secondary);font-family:var(--font-mono);font-size:11px;">0 conceptos</span>
+                <button type="button" class="pane-min-btn" data-maximize-pane="descomposicion"
+                  title="Maximizar / Dejar solo Descomposición">
+                  ⤢ Solo este
+                </button>
+                <button type="button" class="pane-min-btn" data-minimize-pane="descomposicion"
+                  title="Minimizar Descomposición al menú lateral">
+                  — Minimizar
+                </button>
+              </div>
+            </div>
+            <div class="pane-body">
+              <table class="grid-table">
+                <thead>
+                  <tr>
+                    <th style="width:125px;">Código</th>
+                    <th style="width:110px;">Naturaleza</th>
+                    <th style="width:44px;">Ud</th>
+                    <th>Resumen</th>
+                    <th class="num" style="width:64px;">Factor</th>
+                    <th class="num" style="width:86px;">Rendimiento</th>
+                    <th class="num" style="width:90px;">Precio (€)</th>
+                    <th class="num" style="width:100px;">Importe (€)</th>
+                    <th class="num" style="width:68px;">Acción</th>
+                  </tr>
+                </thead>
+                <tbody id="decompTableBody"></tbody>
+              </table>
+            </div>
+            <div id="natureBreakdownStrip" class="nature-strip"></div>
+          </div>
+
+                    <div id="dockPane-mediciones" class="dockable-pane" data-pane-id="mediciones">
+            <div class="pane-header">
+              <span class="pane-header-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="3" y="4" width="18" height="16" rx="2" />
+                  <line x1="3" y1="10" x2="21" y2="10" />
+                  <line x1="9" y1="4" x2="9" y2="20" />
+                </svg>
+                <span>Mediciones editables</span>
+              </span>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span id="measSummaryBadge"
+                  style="color:var(--accent);font-family:var(--font-mono);font-size:11px;"></span>
+                <button type="button" class="pane-min-btn" data-maximize-pane="mediciones"
+                  title="Maximizar / Dejar solo Mediciones">
+                  ⤢ Solo este
+                </button>
+                <button type="button" class="pane-min-btn" data-minimize-pane="mediciones"
+                  title="Minimizar Mediciones al menú lateral">
+                  — Minimizar
+                </button>
+              </div>
+            </div>
+
+            <div id="detail-mediciones" class="pane-body" style="display:flex;flex-direction:column;">
+              <div class="meas-toolbar">
+                <div style="display:flex;gap:6px;align-items:center;">
+                  <button type="button" id="btnAddMeasLine" class="lvl-pill"
+                    style="border-color:var(--accent);color:var(--accent);">+ Línea de Medición</button>
+                  <button type="button" id="btnAddMeasSubheader" class="lvl-pill">+ Subtítulo / Zona</button>
+                </div>
+                <div id="measDirtyBanner" class="meas-dirty-banner">
+                  <span>Medición modificada</span>
+                  <button type="button" id="btnPreviewApplyMeas" class="btn-confirm-ok"
+                    style="padding:3px 9px;font-size:11px;">✓ Ver Impacto y Aplicar (OK/NO)</button>
+                  <button type="button" id="btnDiscardMeas" class="btn-cancel-no"
+                    style="padding:3px 8px;font-size:11px;">✕ Descartar</button>
+                </div>
+              </div>
+              <div style="flex:1;overflow:auto;">
+                <table class="grid-table">
+                  <thead>
+                    <tr>
+                      <th style="width:40px;">Lín.</th>
+                      <th>Comentario / Zona / Subapartado</th>
+                      <th class="num" style="width:78px;">Uds</th>
+                      <th class="num" style="width:82px;">Longitud</th>
+                      <th class="num" style="width:82px;">Anchura</th>
+                      <th class="num" style="width:82px;">Altura</th>
+                      <th class="num" style="width:94px;">Parcial</th>
+                      <th class="num" style="width:42px;">✕</th>
+                    </tr>
+                  </thead>
+                  <tbody id="measurementsTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+                    <div id="dockPane-pliego" class="dockable-pane hidden-pane" data-pane-id="pliego">
+            <div class="pane-header">
+              <span class="pane-header-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                </svg>
+                <span>Comentario / Pliego de Condiciones</span>
+              </span>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <button type="button" class="pane-min-btn" data-maximize-pane="pliego"
+                  title="Maximizar / Dejar solo Comentario">
+                  ⤢ Solo este
+                </button>
+                <button type="button" class="pane-min-btn" data-minimize-pane="pliego"
+                  title="Minimizar Comentario / Pliego al menú lateral">
+                  — Minimizar
+                </button>
+              </div>
+            </div>
+            <div id="detail-pliego" class="pane-body" style="display:flex;flex-direction:column;height:100%;">
+              <div id="pliegoContent" class="pliego-container"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+    <section id="view-matrix" class="view-section" role="tabpanel">
+    <div class="filters-bar">
+      <span style="font-size:11.5px;font-weight:600;color:var(--text-secondary);">Filtrar Matriz:</span>
+      <select id="matrixRoleFilter" class="filter-select" aria-label="Filtrar por naturaleza o rol">
+        <option value="ALL">Todos los Roles</option>
+      </select>
+      <div id="dynamicLevelFilters" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+      <input id="matrixSearchInput" type="search" class="search-input"
+        style="max-width:250px;padding-left:10px;padding-right:10px;" placeholder="Filtrar código o descripción..." />
+      <span id="matrixFilterStats"
+        style="margin-left:auto;color:var(--text-secondary);font-family:var(--font-mono);font-size:11px;"></span>
+    </div>
+    <div class="pane-body" style="background:var(--bg-surface);">
+      <table class="grid-table">
+        <thead id="matrixTableHead"></thead>
+        <tbody id="matrixTableBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+    <section id="view-analytics" class="view-section" role="tabpanel">
+    <div id="analyticsContainer" class="exec-scroll"></div>
+  </section>
+
+    <div id="mobileMenuBackdrop" class="mobile-menu-backdrop" aria-hidden="true"></div>
+  <div id="mobileMenuSheet" class="mobile-menu-sheet" role="dialog" aria-modal="true" aria-label="Menú principal"
+    aria-hidden="true">
+    <div class="mobile-menu-sheet-header">
+      <span class="sheet-grabber" aria-hidden="true"></span>
+      <strong>Menú</strong>
+      <button type="button" id="btnCloseMobileMenu" class="btn-action" aria-label="Cerrar menú">✕</button>
+    </div>
+    <div id="mobileMenuSheetBody" class="mobile-menu-sheet-body"></div>
+  </div>
+
+    <nav id="mobileBottomBar" class="mobile-bottom-bar" aria-label="Acciones rápidas"></nav>
+
+    <div id="depthDialog" class="menu-dialog-backdrop" role="dialog" aria-modal="true" aria-labelledby="depthDialogTitle">
+    <div class="menu-dialog">
+      <div class="menu-dialog-header">
+        <strong id="depthDialogTitle">≡ Profundidad del Árbol</strong>
+        <button type="button" class="btn-action" data-close-dialog aria-label="Cerrar">✕</button>
+      </div>
+      <div style="padding:16px;display:flex;flex-direction:column;gap:12px;">
+        <span style="font-size:12px;color:var(--text-secondary);">Selecciona el nivel de despliegue jerárquico del
+          presupuesto:</span>
+        <div id="depthDialogButtonsContainer" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+      </div>
+    </div>
+  </div>
+
+    <div id="shortcutsDialog" class="menu-dialog-backdrop" role="dialog" aria-modal="true"
+    aria-labelledby="shortcutsDialogTitle">
+    <div class="menu-dialog">
+      <div class="menu-dialog-header">
+        <strong id="shortcutsDialogTitle">⌨ Atajos de teclado</strong>
+        <button type="button" class="btn-action" data-close-dialog aria-label="Cerrar">✕</button>
+      </div>
+      <table class="grid-table shortcuts-table">
+        <tbody id="shortcutsList"></tbody>
+      </table>
+    </div>
+  </div>
+
+    <div id="aboutDialog" class="menu-dialog-backdrop" role="dialog" aria-modal="true" aria-labelledby="aboutDialogTitle">
+    <div class="menu-dialog">
+      <div class="menu-dialog-header">
+        <strong id="aboutDialogTitle">ARQMED · STUDIO</strong>
+        <button type="button" class="btn-action" data-close-dialog aria-label="Cerrar">✕</button>
+      </div>
+      <p style="padding:14px 16px;color:var(--text-secondary);line-height:1.6;">
+        Editor universal de presupuestos FIEBDC-3 (.bc3).<br />
+        Todos tus presupuestos y preferencias se guardan solo en este dispositivo (IndexedDB + localStorage).
+      </p>
+    </div>
+  </div>
+
+  <script src="../output/presupuesto_data.js"></script>
+  <script src="app.js"></script>
+  <script src="menubar.js"></script>
+</body>
+
+</html>

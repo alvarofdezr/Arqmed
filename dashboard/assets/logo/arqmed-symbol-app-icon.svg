@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256"><title>ARQMED · Editor FIEBDC-3</title><rect width="256" height="256" rx="57.6" fill="#0b0f17"/><g transform="translate(37.25 37.25) scale(0.709)" fill="#f8fafc">
+  <title id="title">ARQMED Symbol Small 16px</title>
+  <!-- Slightly beefed up for 16-32px favicon rendering -->
+  <path fill="#f8fafc" d="M16 16 H144 L176 52 H64 V204 H176 L144 240 H16 Z" />
+  <path fill="#f8fafc" d="M92 72 H240 V106 H92 Z" />
+  <path fill="#f8fafc" d="M132 112 H240 V144 H132 Z" />
+  <path fill="#f8fafc" d="M92 150 H240 V184 H92 Z" />
+</g></svg>

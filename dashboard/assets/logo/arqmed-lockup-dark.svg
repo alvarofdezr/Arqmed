@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 256" width="1120" height="256" role="img" aria-labelledby="title">
+  <title id="title">ARQMED Lockup (Dark Mode)</title>
+  <g id="symbol">
+    <path fill="#F8FAFC" d="M24 24 H140 L172 56 H60 V200 H172 L140 232 H24 Z" />
+    <path fill="#64748B" d="M96 76 H232 V104 H96 Z" />
+    <path fill="#F59E0B" d="M136 114 H232 V142 H136 Z" />
+    <path fill="#64748B" d="M96 152 H232 V180 H96 Z" />
+  </g>
+  <g id="wordmark">
+    <!-- A -->
+    <path fill="#F8FAFC" fill-rule="evenodd" d="M328 56 H364 L416 200 H382 L372 170 H320 L310 200 H276 Z M346 94 L328 144 H364 Z" />
+    <!-- R -->
+    <path fill="#F8FAFC" fill-rule="evenodd" d="M432 56 H504 A42 42 0 0 1 546 98 V102 A40 40 0 0 1 516 140 L556 200 H520 L482 142 H464 V200 H432 Z M464 84 V116 H500 A16 16 0 0 0 516 100 V100 A16 16 0 0 0 500 84 Z" />
+    <!-- Q -->
+    <path fill="#F8FAFC" fill-rule="evenodd" d="M624 54 C670 54 700 84 700 128 C700 152 690 172 674 186 L696 208 L674 226 L650 200 C642 202 634 202 624 202 C578 202 548 172 548 128 C548 84 578 54 624 54 Z M624 82 C596 82 582 100 582 128 C582 156 596 174 624 174 C652 174 666 156 666 128 C666 100 652 82 624 82 Z" />
+    <!-- M -->
+    <path fill="#F8FAFC" d="M720 56 H756 L792 136 L828 56 H864 V200 H834 V112 L802 180 H782 L750 112 V200 H720 Z" />
+    <!-- E (Technical Amber) -->
+    <path fill="#F59E0B" d="M884 56 H972 V84 H916 V114 H964 V142 H916 V172 H972 V200 H884 Z" />
+    <!-- D -->
+    <path fill="#F8FAFC" fill-rule="evenodd" d="M992 56 H1044 C1084 56 1104 84 1104 128 C1104 172 1084 200 1044 200 H992 Z M1024 84 V172 H1042 C1064 172 1072 156 1072 128 C1072 100 1064 84 1042 84 Z" />
+  </g>
+</svg>
+
