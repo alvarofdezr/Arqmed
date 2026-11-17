@@ -1,0 +1,29 @@
+{
+  "name": "arqmed",
+  "version": "1.0.0",
+  "description": "<p align=\"center\">   <picture>     <source media=\"(prefers-color-scheme: dark)\" srcset=\"dashboard/assets/logo/arqmed-lockup-dark.svg\">     <img src=\"dashboard/assets/logo/arqmed-lockup.svg\" alt=\"ARQMED Studio\" width=\"280\">   </picture> </p>",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alvarofdezr/Arqmed.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/alvarofdezr/Arqmed/issues"
+  },
+  "homepage": "https://github.com/alvarofdezr/Arqmed#readme",
+  "devDependencies": {
+    "@capacitor/android": "^8.6.2",
+    "@capacitor/cli": "^8.6.2",
+    "@capacitor/core": "^8.6.2"
+  }
+}

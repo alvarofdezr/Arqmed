@@ -69,3 +69,12 @@ data/*.txt
 output/*.db
 output/*.csv
 output/*.json
+
+# Android build outputs & local config
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/.idea/
+android/*.iml
+android/app/*.iml

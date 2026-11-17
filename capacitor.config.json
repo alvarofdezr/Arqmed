@@ -1,0 +1,9 @@
+{
+  "appId": "com.arqmed.studio",
+  "appName": "ARQMED Studio",
+  "webDir": "dashboard",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  }
+}
