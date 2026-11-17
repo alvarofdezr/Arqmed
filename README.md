@@ -11,6 +11,7 @@
 
 <p align="center">
   <a href="pyproject.toml"><img src="https://img.shields.io/badge/python-%3E%3D3.10-blue.svg" alt="Python >= 3.10"></a>
+  <a href="https://github.com/alvarofdezr/Arqmed/releases"><img src="https://img.shields.io/badge/Android-APK%20Tablet-brightgreen.svg" alt="Android APK Tablet"></a>
   <a href="pyproject.toml"><img src="https://img.shields.io/badge/dependencias-0%20runtime-success.svg" alt="0 runtime dependencies"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/licencia-MIT-lightgrey.svg" alt="Licencia MIT"></a>
 </p>
@@ -36,6 +37,8 @@ python -m http.server 8080
 ```
 
 Abre `http://localhost:8080` en tu navegador. También puedes abrir directamente el archivo `dashboard/index.html` haciendo doble clic o arrastrar cualquier archivo `.bc3` desde tu equipo sobre la ventana para importarlo y trabajar con él al instante.
+
+Si vas a utilizarlo en una tablet Android, puedes descargar directamente el instalador `.apk` desde la sección [Releases](https://github.com/alvarofdezr/Arqmed/releases) sin necesidad de configurar ningún servidor local.
 
 ## Requisitos e instalación
 
@@ -186,6 +189,10 @@ flowchart LR
 
 ```text
 .
+├── .github/
+│   └── workflows/
+│       └── build-apk.yml                  # Compilación y publicación automática del APK en Releases
+├── android/                               # Proyecto nativo Capacitor para tablets Android
 ├── data/
 │   └── presupuesto_demo.bc3               # Presupuesto FIEBDC-3 anonimizado de demostración
 ├── dashboard/
@@ -193,6 +200,7 @@ flowchart LR
 │   ├── app.js                             # Árbol, paneles modulares, recálculo e IndexedDB
 │   ├── menubar.js                         # Barra de menús, diálogos y gestor de atajos
 │   ├── index.html                         # Entrada principal del estudio ARQMED
+│   ├── presupuesto_data.js                # Bundle de datos precargado para uso local y móvil
 │   └── styles.css                         # Hojas de estilo y temas claro/oscuro
 ├── output/
 │   └── presupuesto_data.js                # Bundle JS precompilado para carga inmediata
@@ -206,8 +214,10 @@ flowchart LR
 │   ├── test_bc3_editor.py                 # Pruebas dinámicas de edición y roundtrip BC3
 │   ├── test_bc3_exporter.py               # Pruebas dinámicas de exportación SQLite, CSV y JS
 │   └── test_bc3_parser.py                 # Pruebas dinámicas de lectura jerárquica y mediciones
+├── capacitor.config.json                  # Configuración del contenedor móvil ARQMED Studio
 ├── index.html                             # Redirección desde la raíz hacia dashboard/index.html
 ├── LICENSE                                # Licencia MIT
+├── package.json                           # Dependencias de Capacitor para la compilación Android
 └── pyproject.toml                         # Configuración del paquete y de pytest
 ```
 
