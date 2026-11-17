@@ -1,0 +1,274 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[spanish,es-nodecimaldot]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{geometry}
+\geometry{top=2.5cm, bottom=2.5cm, left=2.8cm, right=2.8cm}
+
+\usepackage{xcolor}
+\definecolor{arqmedDark}{HTML}{0F172A}
+\definecolor{arqmedAmber}{HTML}{D97706}
+\definecolor{arqmedSlate}{HTML}{475569}
+\definecolor{arqmedLight}{HTML}{F8FAFC}
+\definecolor{arqmedBorder}{HTML}{CBD5E1}
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=arqmedDark,
+    urlcolor=arqmedAmber,
+    citecolor=arqmedSlate,
+    pdftitle={Manual de Usuario - ARQMED Studio},
+    pdfauthor={ARQMED Team}
+}
+
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+
+\newtcolorbox{notabox}[1][Nota práctica]{
+    enhanced,
+    breakable,
+    colback=arqmedLight,
+    colframe=arqmedAmber,
+    arc=3mm,
+    title={\textbf{#1}},
+    fonttitle=\bfseries\color{white},
+    coltitle=white,
+    colbacktitle=arqmedAmber,
+    left=4mm, right=4mm, top=3mm, bottom=3mm,
+    boxrule=0.8pt
+}
+
+\newtcolorbox{tipbox}[1][Consejo de obra]{
+    enhanced,
+    breakable,
+    colback=arqmedLight,
+    colframe=arqmedDark,
+    arc=3mm,
+    title={\textbf{#1}},
+    fonttitle=\bfseries\color{white},
+    coltitle=white,
+    colbacktitle=arqmedDark,
+    left=4mm, right=4mm, top=3mm, bottom=3mm,
+    boxrule=0.8pt
+}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{listings}
+\usepackage{enumitem}
+\usepackage{titlesec}
+
+\titleformat{\section}
+  {\normalfont\Large\bfseries\color{arqmedDark}}{\thesection}{1em}{}[\titlerule]
+\titleformat{\subsection}
+  {\normalfont\large\bfseries\color{arqmedSlate}}{\thesubsection}{1em}{}
+
+\lstset{
+    basicstyle=\small\ttfamily,
+    backgroundcolor=\color{arqmedLight},
+    frame=single,
+    rulecolor=\color{arqmedBorder},
+    breaklines=true,
+    showstringspaces=false
+}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    
+    {\Huge \textbf{\color{arqmedDark}ARQMED Studio}}\\[0.6cm]
+    {\Large \textbf{\color{arqmedAmber}Manual de Usuario y Referencia Operativa}}\\[0.3cm]
+    {\large Motor universal y entorno de trabajo para archivos FIEBDC-3 (.BC3)}\\
+    
+    \vspace{2.5cm}
+    
+    \begin{tcolorbox}[colback=arqmedLight,colframe=arqmedDark,arc=4mm,width=0.85\textwidth,center]
+        \centering
+        \vspace{0.4cm}
+        \textbf{Versión del documento:} 2.0.0\\
+        \textbf{Ámbito:} Aplicación de escritorio, navegador web y tabletas Android\\
+        \textbf{Licencia:} Código abierto (MIT)\\
+        \vspace{0.4cm}
+    \end{tcolorbox}
+    
+    \vfill
+    
+    {\color{arqmedSlate}
+    Guía completa de instalación, flujo de trabajo con presupuestos,\\
+    edición analítica, mediciones y exportación técnica.\\[0.5cm]
+    \today
+    }
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\section{Introducción y conceptos clave}
+
+ARQMED Studio nace para resolver un problema cotidiano en oficinas técnicas y direcciones de obra: la dependencia de programas cerrados de escritorio para consultar, modificar o auditar un presupuesto en formato FIEBDC-3 (.BC3).
+
+El formato FIEBDC-3 es el estándar de intercambio de presupuestos y bases de datos de construcción en España. Aunque casi cualquier software del sector lo exporta, su estructura interna de texto plano con registros posicionales delimitados por barras verticales (\texttt{|}) y barras invertidas (\texttt{\textbackslash}) resulta compleja de procesar sin herramientas especializadas.
+
+ARQMED Studio combina dos piezas:
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{Un motor en Python}: lee registros \texttt{\textasciitilde V}, \texttt{\textasciitilde K}, \texttt{\textasciitilde C}, \texttt{\textasciitilde D}, \texttt{\textasciitilde T}, \texttt{\textasciitilde M} y \texttt{\textasciitilde X}, normaliza sinónimos y códigos con almohadilla (\texttt{\#}), genera desgloses y recalcula costes hacia la raíz de la obra con precisión decimal.
+    \item \textbf{Una interfaz visual}: funciona tanto en navegador web local como instalada en una tableta Android mediante su aplicación nativa (.apk), almacenando la biblioteca de presupuestos en la memoria interna del dispositivo sin enviar información a ningún servidor exterior.
+\end{enumerate}
+
+\section{Primeros pasos: Instalación y arranque}
+
+Puedes utilizar ARQMED Studio según el entorno donde trabajes:
+
+\subsection{Uso en el navegador (PC o portátil)}
+No requiere instalar bases de datos ni dependencias pesadas:
+\begin{enumerate}[leftmargin=*]
+    \item Descarga o clona la carpeta del proyecto.
+    \item Abre una consola en esa ubicación y ejecuta:
+    \begin{lstlisting}
+python -m http.server 8080
+    \end{lstlisting}
+    \item Entra en tu navegador en \url{http://localhost:8080}. El sistema abrirá directamente la pantalla de trabajo.
+\end{enumerate}
+
+\subsection{Uso en tableta Android (Modo obra / APK)}
+Para consultar y anotar mediciones a pie de obra:
+\begin{enumerate}[leftmargin=*]
+    \item Descarga el archivo de instalación \texttt{arqmed-studio-v1.0.0.apk} desde la sección de \textbf{Releases} en GitHub.
+    \item Pásalo a tu tableta mediante cable USB, almacenamiento en red o descarga directa.
+    \item Pulsa sobre el archivo para instalarlo.
+    \item Al abrir la aplicación, dispondrás de la pantalla completa optimizada para uso táctil, con arranque en tema claro y carga local autónoma.
+\end{enumerate}
+
+\subsection{Uso avanzado desde la consola (Python CLI)}
+Si trabajas con procesamiento por lotes o prefieres extraer bases de datos SQLite y hojas de cálculo:
+\begin{lstlisting}
+# Procesar un archivo especifico hacia una carpeta de salida
+python -m src.bc3_exporter ruta/al/presupuesto.bc3 output
+\end{lstlisting}
+El comando genera automáticamente:
+\begin{itemize}
+    \item \texttt{presupuesto.db}: base de datos relacional SQLite con tablas indexadas para conceptos, matrices y líneas de medición.
+    \item \texttt{matriz\_presupuesto.csv}: tabla completa apta para abrir en Excel o LibreOffice Calc.
+    \item \texttt{mediciones\_detalle.csv}: desglose dimensional línea a línea con comentarios de tramos.
+    \item \texttt{presupuesto\_data.js}: archivo estructurado para el visor web.
+\end{itemize}
+
+\section{Estructura de la interfaz de usuario}
+
+La pantalla principal se organiza en cuatro zonas de trabajo pensadas para no saturar la vista:
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tcolorbox}[colback=white,colframe=arqmedBorder,arc=2mm,title=Organización visual de la pantalla]
+        \small
+        \textbf{1. Barra superior:}\\
+        Logo de la aplicación $\mid$ Título del proyecto activo $\mid$ Indicador de guardado local $\mid$ Botón \textbf{Mis .BC3}\\
+        \rule{\textwidth}{0.4pt}\\
+        \textbf{2. Barra de menús:}\\
+        Archivo $\mid$ Editar $\mid$ Ver $\mid$ Preferencias $\mid$ Ayuda\\
+        \rule{\textwidth}{0.4pt}\\
+        \textbf{3. Zona central (Árbol jerárquico):}\\
+        Tabla interactiva con código, unidad, resumen, precio, medición e importe.\\
+        \rule{\textwidth}{0.4pt}\\
+        \textbf{4. Paneles inferiores acoplables:}\\
+        Descomposición de precios $\mid$ Desglose de mediciones con cotas $\mid$ Pliego técnico
+    \end{tcolorbox}
+\end{figure}
+
+\subsection{El árbol de presupuesto}
+Presenta los capítulos numerados por colores según su nivel jerárquico. Puedes pulsar sobre el icono desplegable de cualquier capítulo para ver sus subcapítulos o sus partidas finales. 
+
+Cada fila muestra el rendimiento, el factor multiplicador, la medición acumulada y el importe resultante en euros.
+
+\section{Operaciones habituales de trabajo}
+
+\subsection{Importar presupuestos}
+Hay dos formas de abrir un archivo de mediciones:
+\begin{itemize}
+    \item \textbf{Arrastrar y soltar}: en un ordenador, arrastra cualquier archivo con extensión \texttt{.bc3} o \texttt{.txt} directamente sobre la ventana. La pantalla mostrará una zona receptora y cargará la obra en memoria al soltarlo.
+    \item \textbf{Menú Archivo}: pulsa en \textbf{Archivo $\rightarrow$ Importar .BC3...} o utiliza la combinación de teclas \texttt{Ctrl+O}. Se abrirá el selector de archivos del sistema operativo o el gestor de documentos de Android.
+\end{itemize}
+
+\subsection{Gestión de múltiples obras (Biblioteca local)}
+Cuando pulsas el botón \textbf{Mis .BC3} (o \texttt{Archivo $\rightarrow$ Mis .BC3...}), accedes al panel de proyectos guardados en el dispositivo. Cada tarjeta indica:
+\begin{itemize}
+    \item Nombre del archivo original y título de la obra.
+    \item Importe total del presupuesto de ejecución material.
+    \item Fecha y hora del último cambio guardado.
+\end{itemize}
+Desde esa ventana puedes cambiar de proyecto activo con un clic, crear duplicados para presupuestos alternativos, renombrar obras o borrarlas para liberar espacio.
+
+\begin{tipbox}[Consejo sobre seguridad de datos]
+Toda la información reside exclusivamente en la memoria local de tu navegador o tableta (usando el motor de base de datos IndexedDB). Ninguna cifra, precio ni descripción sale a internet.
+\end{tipbox}
+
+\subsection{Edición de precios y simulación de impacto (OK / NO)}
+Uno de los puntos críticos al editar un archivo .BC3 es que ciertos materiales (como el acero corrugado, el cemento o la mano de obra de oficial) participan en decenas de partidas distintas a lo largo de toda la obra.
+
+Si modificas el precio de un recurso elemental:
+\begin{enumerate}[leftmargin=*]
+    \item Haz doble clic sobre el importe o pulsa \texttt{F2} en la fila elegida.
+    \item Se abrirá el diálogo de \textbf{Alcance de Impacto}.
+    \item La ventana indicará cuántas veces aparece ese concepto en el presupuesto y qué variación económica causará en cada capítulo.
+    \item Puedes elegir marcar \textbf{OK} solo en las partidas donde quieras trasladar la subida o bajada, y marcar \textbf{NO} en aquellas donde prefieras mantener el precio anterior.
+    \item Al pulsar confirmar, el motor recalcula las partidas afectadas y actualiza en cascada el total de cada capítulo hasta la raíz del presupuesto.
+\end{enumerate}
+
+\subsection{Edición de líneas de medición}
+Al hacer clic sobre cualquier partida con medición detallada, el panel inferior de \textbf{Mediciones} se sincroniza de inmediato:
+\begin{itemize}
+    \item Cada línea cuenta con su comentario o zona explicativa, número de unidades, longitud, anchura y altura.
+    \item Si una partida requiere tramos parciales, añade líneas con el botón superior del panel.
+    \item La suma del producto de dimensiones actualiza la medición total de la partida en tiempo real.
+\end{itemize}
+
+\subsection{Guardar y exportar el resultado}
+Para guardar el trabajo en el disco duro o en el almacenamiento de la tableta:
+\begin{itemize}
+    \item Pulsa \textbf{Archivo $\rightarrow$ Guardar .BC3} o pulsa \texttt{Ctrl+S}.
+    \item El programa generará un archivo con sufijo \texttt{\_EDITADO.bc3} totalmente compatible con Presto, Arquímedes, Menfis o cualquier software conforme al estándar FIEBDC-3.
+    \item Si necesitas entregar listados a clientes o subcontratas en hojas de cálculo, elige \textbf{Archivo $\rightarrow$ Exportar CSV (Excel)}.
+\end{itemize}
+
+\section{Tabla de atajos de teclado rápidos}
+
+Para agilizar el trabajo en oficina con teclado físico, ARQMED Studio dispone de los siguientes atajos:
+
+\begin{table}[htbp]
+    \centering
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabularx}{\textwidth}{l X}
+        \toprule
+        \textbf{Atajo} & \textbf{Acción que ejecuta} \\
+        \midrule
+        \texttt{Ctrl + S} & Guardar y descargar el archivo .BC3 actualizado \\
+        \texttt{Ctrl + O} & Abrir el cuadro de diálogo para importar un nuevo archivo .BC3 \\
+        \texttt{Ctrl + Z} & Deshacer el último cambio de precio, medición o texto \\
+        \texttt{Ctrl + Y} & Rehacer la modificación deshecha previamente \\
+        \texttt{Ctrl + K} & Activar el campo de búsqueda rápida en el árbol \\
+        \texttt{F2}       & Editar el concepto o partida seleccionada \\
+        \texttt{Insert}   & Crear y vincular un concepto hijo bajo el nodo actual \\
+        \texttt{Supr}     & Eliminar el concepto seleccionado y su descomposición \\
+        \texttt{Alt + $\uparrow$ / $\downarrow$} & Reordenar la fila seleccionada dentro de su capítulo \\
+        $\uparrow$ / $\downarrow$ / $\leftarrow$ / $\rightarrow$ & Moverse por las partidas y plegar o desplegar ramas \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\section{Preguntas frecuentes y resolución de dudas}
+
+\subsection{¿Por qué una partida no recalcula al modificar una cota?}
+Verifica que la línea de medición no esté catalogada como título o subtítulo sin dimensiones (tipo de línea de texto informativo). Si una línea tiene unidades en blanco o cero, su subtotal será nulo.
+
+\subsection{¿Puedo abrir archivos creados en versiones antiguas de MS-DOS?}
+Sí. El motor examina los primeros 512 bytes de cabecera. Si detecta marcas de página de códigos CP850 o IBM850 tradicionales de bases de datos antiguas, conmuta la tabla de caracteres para que las tildes, las eñes y los símbolos de diámetro (\O) se lean limpiamente.
+
+\subsection{¿Qué ocurre si cierro el navegador sin haber descargado el .BC3?}
+No pierdes el trabajo. Los cambios quedan grabados de forma continua en la base de datos local de tu navegador. Al volver a abrir la página o la aplicación de la tableta, el presupuesto volverá a mostrarse en el mismo estado en que lo dejaste.
+
+\end{document}
