@@ -10,6 +10,7 @@
 </p>
 
 <p align="center">
+  <a href="https://alvarofdezr.github.io/Arqmed/"><img src="https://img.shields.io/badge/Demo%20Web-GitHub%20Pages-blueviolet.svg" alt="Demo Web GitHub Pages"></a>
   <a href="pyproject.toml"><img src="https://img.shields.io/badge/python-%3E%3D3.10-blue.svg" alt="Python >= 3.10"></a>
   <a href="https://github.com/alvarofdezr/Arqmed/releases"><img src="https://img.shields.io/badge/Android-APK%20Tablet-brightgreen.svg" alt="Android APK Tablet"></a>
   <a href="pyproject.toml"><img src="https://img.shields.io/badge/dependencias-0%20runtime-success.svg" alt="0 runtime dependencies"></a>
@@ -191,7 +192,9 @@ flowchart LR
 .
 ├── .github/
 │   └── workflows/
-│       └── build-apk.yml                  # Compilación y publicación automática del APK en Releases
+│       ├── build-apk.yml                  # Compilación y publicación automática del APK en Releases
+│       ├── ci.yml                         # Verificación de tests en Python (3.10-3.12) y Node.js
+│       └── deploy-pages.yml               # Publicación automática del estudio web en GitHub Pages
 ├── android/                               # Proyecto nativo Capacitor para tablets Android
 ├── data/
 │   └── presupuesto_demo.bc3               # Presupuesto FIEBDC-3 anonimizado de demostración
