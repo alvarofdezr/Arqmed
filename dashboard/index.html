@@ -213,7 +213,7 @@
       </div>
     </div>
 
-    <nav class="mode-switcher" role="tablist" aria-label="Modos de visualización">
+    <nav class="mode-switcher" role="tablist" aria-label="Modos de visualización" style="display:none;">
       <button class="mode-btn active" role="tab" aria-selected="true" data-view="arqmed">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -248,12 +248,12 @@
 
     <div class="toolbar-actions">
       <div class="project-quick-bar">
+        <button type="button" id="btnOpenProjectsModal" class="btn-action"
+          title="Gestionar todos mis archivos .BC3 guardados localmente">
+          <span>📁</span>
+        </button>
         <select id="projectSwitcherSelect" class="filter-select project-switcher-select"
           aria-label="Cambiar de archivo BC3 activo" title="Elegir qué archivo .BC3 guardado usar ahora"></select>
-        <button type="button" id="btnOpenProjectsModal" class="btn-action legacy-hidden"
-          title="Gestionar todos mis archivos .BC3 guardados localmente">
-          <span>📚 Mis .BC3</span>
-        </button>
       </div>
 
             <button id="btnUndo" class="btn-action legacy-hidden" disabled title="Deshacer último cambio aprobado (Ctrl+Z)"

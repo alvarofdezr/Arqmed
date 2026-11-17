@@ -930,7 +930,7 @@
 
     const btnOpenModal = document.getElementById("btnOpenProjectsModal");
     if (btnOpenModal) {
-      btnOpenModal.innerHTML = `<span>📚 Mis .BC3 (${savedProjectsMeta.length})</span>`;
+      btnOpenModal.innerHTML = `<span>📁 Mis .BC3 (${savedProjectsMeta.length})</span>`;
     }
 
     const statsEl = document.getElementById("localStorageStatsText");
