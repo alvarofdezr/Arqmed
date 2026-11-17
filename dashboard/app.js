@@ -292,14 +292,28 @@
 
   function parseBc3ArrayBuffer(buffer, fileName) {
     const bytes = new Uint8Array(buffer);
-    const headAscii = new TextDecoder("ascii").decode(bytes.slice(0, 512)).toUpperCase();
+    let headAscii = "";
+    try {
+      headAscii = new TextDecoder("ascii").decode(bytes.slice(0, 512)).toUpperCase();
+    } catch (_e) {
+      headAscii = "";
+    }
     let encoding = "windows-1252";
     if (headAscii.includes("UTF-8") || headAscii.includes("UTF8")) {
       encoding = "utf-8";
     } else if (headAscii.includes("850")) {
       encoding = "ibm866";
     }
-    const text = new TextDecoder(encoding).decode(bytes);
+    let text = "";
+    try {
+      text = new TextDecoder(encoding).decode(bytes);
+    } catch (_e) {
+      try {
+        text = new TextDecoder("windows-1252").decode(bytes);
+      } catch (_e2) {
+        text = new TextDecoder("utf-8").decode(bytes);
+      }
+    }
     const records = text.split(/(?=~[A-Z0-9_]+\|)/);
 
     const parseFloatSafe = (val, defVal = 0) => {
@@ -3239,16 +3253,23 @@
       if (!fileList || !fileList.length) return;
       setLocalSaveStatus("⟳ Importando .BC3...", true);
       let lastProjectId = null;
-      for (const file of Array.from(fileList)) {
-        const buf = await file.arrayBuffer();
-        const parsed = parseBc3ArrayBuffer(buf, file.name);
-        const newId = `proj_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
-        const rec = buildProjectRecord(newId, parsed, file.name);
-        await dbPutProject(rec);
-        lastProjectId = newId;
-      }
-      if (lastProjectId) {
-        await switchActiveProject(lastProjectId);
+      try {
+        for (const file of Array.from(fileList)) {
+          const buf = await file.arrayBuffer();
+          const parsed = parseBc3ArrayBuffer(buf, file.name);
+          const newId = `proj_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+          const rec = buildProjectRecord(newId, parsed, file.name);
+          await dbPutProject(rec);
+          lastProjectId = newId;
+        }
+        if (lastProjectId) {
+          await switchActiveProject(lastProjectId);
+          setLocalSaveStatus("✓ .BC3 importado", false);
+        }
+      } catch (err) {
+        console.error("Error importando .bc3:", err);
+        alert("Error al procesar el archivo .bc3: " + (err && err.message ? err.message : String(err)));
+        setLocalSaveStatus("⚠️ Error al importar", false);
       }
     };
 
