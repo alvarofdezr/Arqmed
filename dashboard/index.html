@@ -31,7 +31,7 @@
     </div>
   </div>
 
-    <div id="impactModalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true"
+  <div id="impactModalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true"
     aria-labelledby="impactModalTitle">
     <div class="impact-modal">
       <div class="impact-modal-header">
@@ -48,7 +48,7 @@
       </div>
 
       <div class="impact-modal-body">
-                <div id="impactEditFieldsWrap" class="edit-form-grid">
+        <div id="impactEditFieldsWrap" class="edit-form-grid">
           <div class="form-field">
             <label for="editFieldCode">Código BC3</label>
             <input id="editFieldCode" type="text" class="form-input mono" readonly />
@@ -71,7 +71,7 @@
           </div>
         </div>
 
-                <div class="impact-sim-strip">
+        <div class="impact-sim-strip">
           <div class="sim-card">
             <div class="k">Presupuesto Actual</div>
             <div id="simOldTotal" class="v">—</div>
@@ -90,7 +90,7 @@
           </div>
         </div>
 
-                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
           <div style="font-size:12px;color:var(--text-secondary);" id="impactScopeSubtitle">
             Revisa dónde interviene este concepto y marca <strong>OK</strong> o <strong>NO</strong> en cada partida
             afectada:
@@ -104,7 +104,7 @@
           </div>
         </div>
 
-                <div style="border:1px solid var(--border-default);border-radius:8px;overflow:auto;max-height:340px;">
+        <div style="border:1px solid var(--border-default);border-radius:8px;overflow:auto;max-height:340px;">
           <table class="grid-table">
             <thead>
               <tr>
@@ -134,7 +134,7 @@
     </div>
   </div>
 
-    <div id="projectsModalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true"
+  <div id="projectsModalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true"
     aria-labelledby="projectsModalTitle">
     <div class="impact-modal" style="max-width:860px;">
       <div class="impact-modal-header">
@@ -152,7 +152,7 @@
       <div class="impact-modal-body">
         <div class="local-storage-banner">
           <div>
-            <strong>🔒 Almacenamiento 100% Local y Privado (IndexedDB)</strong>
+            <strong>Almacenamiento local</strong>
             <div style="font-size:11.5px;color:var(--text-secondary);margin-top:2px;">
               Todos los archivos <code>.bc3</code> que abras y cada cambio que apruebes se guardan automáticamente en la
               memoria local de tu navegador, únicamente para ti en este dispositivo.
@@ -183,7 +183,7 @@
     </div>
   </div>
 
-    <header class="topbar">
+  <header class="topbar">
     <div class="brand-cluster">
       <button type="button" id="btnMobileMenu" class="mobile-menu-btn" aria-label="Abrir menú principal"
         aria-controls="mobileMenuSheet" aria-expanded="false">
@@ -254,7 +254,7 @@
         </button>
       </div>
 
-            <button id="btnUndo" class="btn-action legacy-hidden" disabled title="Deshacer último cambio aprobado (Ctrl+Z)"
+      <button id="btnUndo" class="btn-action legacy-hidden" disabled title="Deshacer último cambio aprobado (Ctrl+Z)"
         style="opacity:0.5;">
         <span>↩ Deshacer (0)</span>
       </button>
@@ -293,9 +293,9 @@
     </div>
   </header>
 
-    <nav id="appMenubar" class="app-menubar" role="menubar" aria-label="Menú principal"></nav>
+  <nav id="appMenubar" class="app-menubar" role="menubar" aria-label="Menú principal"></nav>
 
-    <section id="view-arqmed" class="view-section active" role="tabpanel">
+  <section id="view-arqmed" class="view-section active" role="tabpanel">
     <div class="subtoolbar">
       <button type="button" id="btnMobileDrawerToggle" class="lvl-pill mobile-drawer-trigger"
         title="Abrir menú de paneles activos">
@@ -324,7 +324,7 @@
     <div class="arqmed-body-shell">
       <div id="sideDockBackdrop" class="side-dock-backdrop" aria-hidden="true"></div>
 
-            <aside id="sidePanelDock" class="side-panel-dock collapsed" aria-label="Menú lateral de vista rápida">
+      <aside id="sidePanelDock" class="side-panel-dock collapsed" aria-label="Menú lateral de vista rápida">
         <div class="side-dock-header">
           <span class="side-dock-title">Vista Rápida</span>
           <button type="button" id="btnToggleSideDock" class="side-dock-collapse-btn"
@@ -460,7 +460,7 @@
       </aside>
 
       <div id="arqmedWorkspace" class="arqmed-workspace">
-                <div id="treePane" class="tree-pane" tabindex="0" aria-label="Árbol jerárquico del presupuesto">
+        <div id="treePane" class="tree-pane" tabindex="0" aria-label="Árbol jerárquico del presupuesto">
           <table class="grid-table" id="arqmedTreeTable">
             <thead id="arqmedTreeHead">
               <tr>
@@ -479,10 +479,10 @@
           </table>
         </div>
 
-                <div id="resizerH" class="resizer-h" title="Arrastra para redimensionar la altura del árbol"></div>
+        <div id="resizerH" class="resizer-h" title="Arrastra para redimensionar la altura del árbol"></div>
 
-                <div id="bottomWorkspace" class="bottom-workspace">
-                    <div id="dockPane-descomposicion" class="dockable-pane" data-pane-id="descomposicion">
+        <div id="bottomWorkspace" class="bottom-workspace">
+          <div id="dockPane-descomposicion" class="dockable-pane" data-pane-id="descomposicion">
             <div class="pane-header">
               <span class="pane-header-title">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -528,7 +528,7 @@
             <div id="natureBreakdownStrip" class="nature-strip"></div>
           </div>
 
-                    <div id="dockPane-mediciones" class="dockable-pane" data-pane-id="mediciones">
+          <div id="dockPane-mediciones" class="dockable-pane" data-pane-id="mediciones">
             <div class="pane-header">
               <span class="pane-header-title">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -588,7 +588,7 @@
             </div>
           </div>
 
-                    <div id="dockPane-pliego" class="dockable-pane hidden-pane" data-pane-id="pliego">
+          <div id="dockPane-pliego" class="dockable-pane hidden-pane" data-pane-id="pliego">
             <div class="pane-header">
               <span class="pane-header-title">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -618,7 +618,7 @@
     </div>
   </section>
 
-    <section id="view-matrix" class="view-section" role="tabpanel">
+  <section id="view-matrix" class="view-section" role="tabpanel">
     <div class="filters-bar">
       <span style="font-size:11.5px;font-weight:600;color:var(--text-secondary);">Filtrar Matriz:</span>
       <select id="matrixRoleFilter" class="filter-select" aria-label="Filtrar por naturaleza o rol">
@@ -638,11 +638,11 @@
     </div>
   </section>
 
-    <section id="view-analytics" class="view-section" role="tabpanel">
+  <section id="view-analytics" class="view-section" role="tabpanel">
     <div id="analyticsContainer" class="exec-scroll"></div>
   </section>
 
-    <div id="mobileMenuBackdrop" class="mobile-menu-backdrop" aria-hidden="true"></div>
+  <div id="mobileMenuBackdrop" class="mobile-menu-backdrop" aria-hidden="true"></div>
   <div id="mobileMenuSheet" class="mobile-menu-sheet" role="dialog" aria-modal="true" aria-label="Menú principal"
     aria-hidden="true">
     <div class="mobile-menu-sheet-header">
@@ -653,9 +653,9 @@
     <div id="mobileMenuSheetBody" class="mobile-menu-sheet-body"></div>
   </div>
 
-    <nav id="mobileBottomBar" class="mobile-bottom-bar" aria-label="Acciones rápidas"></nav>
+  <nav id="mobileBottomBar" class="mobile-bottom-bar" aria-label="Acciones rápidas"></nav>
 
-    <div id="depthDialog" class="menu-dialog-backdrop" role="dialog" aria-modal="true" aria-labelledby="depthDialogTitle">
+  <div id="depthDialog" class="menu-dialog-backdrop" role="dialog" aria-modal="true" aria-labelledby="depthDialogTitle">
     <div class="menu-dialog">
       <div class="menu-dialog-header">
         <strong id="depthDialogTitle">≡ Profundidad del Árbol</strong>
@@ -669,7 +669,7 @@
     </div>
   </div>
 
-    <div id="shortcutsDialog" class="menu-dialog-backdrop" role="dialog" aria-modal="true"
+  <div id="shortcutsDialog" class="menu-dialog-backdrop" role="dialog" aria-modal="true"
     aria-labelledby="shortcutsDialogTitle">
     <div class="menu-dialog">
       <div class="menu-dialog-header">
@@ -682,7 +682,7 @@
     </div>
   </div>
 
-    <div id="aboutDialog" class="menu-dialog-backdrop" role="dialog" aria-modal="true" aria-labelledby="aboutDialogTitle">
+  <div id="aboutDialog" class="menu-dialog-backdrop" role="dialog" aria-modal="true" aria-labelledby="aboutDialogTitle">
     <div class="menu-dialog">
       <div class="menu-dialog-header">
         <strong id="aboutDialogTitle">ARQMED · STUDIO</strong>
