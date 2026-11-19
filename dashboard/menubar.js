@@ -119,7 +119,7 @@
           { id: "file.saveBc3", label: "Guardar .BC3", shortcut: "Ctrl+S", allowWhileTyping: true, run: () => api.exportBc3() },
           { id: "file.import", label: "Importar .BC3…", shortcut: "Ctrl+O", allowWhileTyping: true, run: () => api.importBc3() },
           { id: "file.projects", label: "Mis .BC3…", run: () => api.openProjects() },
-          { id: "file.duplicate", label: "Duplicar presupuesto", run: () => api.duplicateActiveProject() },
+          { id: "file.duplicate", label: "Duplicar archivo", run: () => api.duplicateActiveProject() },
           { id: "file.rename", label: "Renombrar…", run: () => api.renameActiveProject() },
           { sep: true },
           { id: "file.exportBc3", label: "Exportar copia .BC3…", allowWhileTyping: true, run: () => api.exportBc3() },

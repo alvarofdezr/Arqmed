@@ -16,6 +16,7 @@
   let draftMeasurementRowId = null;
   let draftMeasurementLines = null;
   let isMeasurementDirty = false;
+  let scopedChapterId = null;
 
   let hideHashInCodes = true;
   let treeRowDensity = "md";
@@ -98,6 +99,7 @@
     AUXILIAR: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.77 1.02 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`,
     PORCENTAJE: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>`,
     CHEVRON: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>`,
+    ENTER_LEVEL: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>`,
     EDIT: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>`,
     PLUS: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
     TRASH: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`,
@@ -1016,6 +1018,9 @@
     redoStack = [];
     updateUndoButton();
     expandedRowIds.clear();
+    scopedChapterId = null;
+    const sb = document.getElementById("chapterScopeBanner");
+    if (sb) sb.hidden = true;
 
     for (const row of data.budget_matrix || []) {
       if (row.node_role === "ROOT" || (row.node_role === "CAPITULO" && row.chapter_depth <= 1)) {
@@ -1048,6 +1053,13 @@
     currentData.metadata.counts.roles = roleCounts;
 
     selectedRowId = rowMap.has(Number(keepRowId)) ? Number(keepRowId) : 1;
+    if (scopedChapterId && rowMap.has(scopedChapterId)) {
+      renderScopeBanner();
+    } else {
+      scopedChapterId = null;
+      const sb = document.getElementById("chapterScopeBanner");
+      if (sb) sb.hidden = true;
+    }
     renderHeaderAndLevelButtons();
     renderArqmedTree();
     selectRow(selectedRowId, false);
@@ -1123,7 +1135,123 @@
     return visibleTreeRoles.has("OTHER");
   }
 
+  function enterChapterScope(rowId) {
+    const row = rowMap.get(Number(rowId));
+    if (!row || row.node_role === "ROOT") {
+      exitChapterScope();
+      return;
+    }
+
+    scopedChapterId = row.row_id;
+
+    // Al abrir el nivel (capítulo N1, subcapítulo N2/N3, partida o subpartida),
+    // aseguramos que sus hijos directos con descendientes salgan expandidos para verse debajo
+    const children = childrenMap.get(row.row_id) || [];
+    for (const ch of children) {
+      if ((childrenMap.get(ch.row_id) || []).length > 0) {
+        expandedRowIds.add(ch.row_id);
+      }
+    }
+
+    // Seleccionamos el concepto abierto para cargar de inmediato su Vista Rápida
+    selectRow(row.row_id, false);
+
+    renderScopeBanner();
+    renderArqmedTree();
+  }
+
+  function exitChapterScope() {
+    scopedChapterId = null;
+    const banner = document.getElementById("chapterScopeBanner");
+    if (banner) banner.hidden = true;
+    renderArqmedTree();
+  }
+
+  function renderScopeBanner() {
+    const banner = document.getElementById("chapterScopeBanner");
+    if (!banner) return;
+    if (!scopedChapterId || !rowMap.has(scopedChapterId)) {
+      banner.hidden = true;
+      return;
+    }
+
+    const row = rowMap.get(scopedChapterId);
+    banner.hidden = false;
+
+    // Breadcrumbs
+    const ancestorChain = [];
+    let curr = row;
+    while (curr) {
+      ancestorChain.unshift(curr);
+      curr = curr.parent_row_id ? rowMap.get(curr.parent_row_id) : null;
+    }
+
+    const breadcrumbsEl = document.getElementById("scopeBreadcrumbs");
+    if (breadcrumbsEl) {
+      breadcrumbsEl.innerHTML = ancestorChain
+        .map((node, idx) => {
+          const isLast = idx === ancestorChain.length - 1;
+          return `
+            <button type="button" class="crumb-btn ${isLast ? "active" : ""}" data-scope-crumb="${node.row_id}" title="${escapeHtml(node.summary)}">
+              ${escapeHtml(formatCodeDisplay(node.code))}
+            </button>
+          `;
+        })
+        .join('<span class="crumb-arrow">›</span>');
+    }
+
+    // Back label
+    const rootRowId = (currentData && currentData.budget_matrix && currentData.budget_matrix[0]) ? currentData.budget_matrix[0].row_id : 1;
+    const backLabel = document.getElementById("scopeBackLabel");
+    if (backLabel) {
+      if (row.parent_row_id && row.parent_row_id !== rootRowId) {
+        const parentRow = rowMap.get(row.parent_row_id);
+        backLabel.textContent = parentRow ? `Atrás (${formatCodeDisplay(parentRow.code)})` : "Atrás";
+      } else {
+        backLabel.textContent = "Árbol General";
+      }
+    }
+
+    // Info
+    const codeEl = document.getElementById("scopeChapterCode");
+    if (codeEl) codeEl.textContent = formatCodeDisplay(row.code);
+
+    const titleEl = document.getElementById("scopeChapterTitle");
+    if (titleEl) titleEl.textContent = row.summary || "";
+
+    const amountEl = document.getElementById("scopeChapterAmount");
+    if (amountEl) {
+      if (row.local_amount !== null && row.local_amount !== undefined) {
+        amountEl.textContent = formatEuro(row.local_amount);
+      } else if (row.unit_price !== null && row.unit_price !== undefined) {
+        amountEl.textContent = `${formatEuro(row.unit_price)} / ${row.unit || "ud"}`;
+      } else {
+        amountEl.textContent = "";
+      }
+    }
+  }
+
   function getVisibleTreeRows() {
+    if (scopedChapterId && rowMap.has(scopedChapterId)) {
+      document.getElementById("searchShortcutBadge").textContent = "Capítulo";
+      const scopedRow = rowMap.get(scopedChapterId);
+      const visible = [];
+      const visitScoped = (parentId) => {
+        const children = childrenMap.get(parentId) || [];
+        for (const ch of children) {
+          if (isRowRoleVisibleInTree(ch)) {
+            visible.push(ch);
+          }
+          if (expandedRowIds.has(ch.row_id)) {
+            visitScoped(ch.row_id);
+          }
+        }
+      };
+      // Mostramos los subcapítulos y partidas del capítulo abierto
+      visitScoped(scopedRow.row_id);
+      return visible;
+    }
+
     const q = treeSearchTerm.trim().toLowerCase();
     if (q) {
       const matchedAndAncestors = new Set();
@@ -1272,10 +1400,24 @@
     visibleTreeRowIds = rows.map((r) => r.row_id);
     const activeCols = treeColumns.filter((c) => c.visible);
 
+    if (scopedChapterId && rows.length === 0) {
+      const target = rowMap.get(scopedChapterId);
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="${activeCols.length}" style="text-align:center;padding:48px 16px;color:var(--text-secondary);">
+            Este concepto (<strong>${escapeHtml(formatCodeDisplay(target ? target.code : ""))}</strong> — ${escapeHtml(target ? target.node_role : "")}) no contiene elementos descompuestos hijos.
+            Puedes consultar o editar sus líneas en la <strong>Vista Rápida</strong> de abajo.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
     const htmlChunks = rows.map((row) => {
       const hasChildren = (childrenMap.get(row.row_id) || []).length > 0;
       const isExpanded = treeSearchTerm.trim() !== "" || expandedRowIds.has(row.row_id);
-      const indentPx = row.depth * 18;
+      const baseDepth = scopedChapterId && rowMap.has(scopedChapterId) ? (rowMap.get(scopedChapterId).depth || 0) + 1 : 0;
+      const indentPx = Math.max(0, row.depth - baseDepth) * 18;
 
       let rowClass = "";
       if (row.node_role === "ROOT") rowClass = "row-root";
@@ -1342,6 +1484,10 @@
               return `
                 <td class="num">
                   <div class="row-actions">
+                    ${hasChildren
+                  ? `<button type="button" class="icon-btn scope-enter-btn" data-enter-scope="${row.row_id}" title="Entrar a este nivel (${escapeHtml(row.summary)})">${SVG_ICONS.ENTER_LEVEL}</button>`
+                  : ""
+                }
                     ${row.node_role !== "ROOT"
                   ? `<button type="button" class="icon-btn" data-move-row="${row.row_id}" data-dir="-1" title="Subir fila (intercambiar con anterior)">${SVG_ICONS.ARROW_UP}</button>
                          <button type="button" class="icon-btn" data-move-row="${row.row_id}" data-dir="1" title="Bajar fila (intercambiar con siguiente)">${SVG_ICONS.ARROW_DOWN}</button>`
@@ -2549,23 +2695,72 @@
         return;
       }
 
+      // 4. Botón específico para entrar al nivel (↗)
+      const enterTrigger = e.target.closest("[data-enter-scope]");
+      if (enterTrigger) {
+        e.stopPropagation();
+        const rId = Number(enterTrigger.dataset.enterScope);
+        enterChapterScope(rId);
+        return;
+      }
+
       const tr = e.target.closest("tr[data-row-id]");
       if (tr) {
         const rId = Number(tr.dataset.rowId);
+        const row = rowMap.get(rId);
         const children = childrenMap.get(rId) || [];
-        const isCurrentlyExpanded = expandedRowIds.has(rId);
-        const isAlreadySelected = selectedRowId === rId;
 
-        if (children.length > 0) {
-          if (!isCurrentlyExpanded) {
-            expandedRowIds.add(rId);
-            renderArqmedTree();
-          } else if (isAlreadySelected) {
-            expandedRowIds.delete(rId);
-            renderArqmedTree();
-          }
+        // Si la fila tiene hijos (capítulo N1, subcapítulo N2/N3, partida o subpartida descompuesta):
+        // Al pulsar sobre ella entra en ese nivel (abriendo su vista enfocada con la Vista Rápida)
+        if (row && children.length > 0 && rId !== scopedChapterId) {
+          enterChapterScope(rId);
+          return;
         }
+
+        // Si no tiene hijos o ya estamos dentro: simplemente seleccionamos la fila para actualizar Vista Rápida
         selectRow(rId);
+      }
+    });
+
+    const btnScopeBack = document.getElementById("btnScopeBack");
+    if (btnScopeBack) {
+      btnScopeBack.addEventListener("click", () => {
+        if (!scopedChapterId) return;
+        const rootRowId = (currentData && currentData.budget_matrix && currentData.budget_matrix[0]) ? currentData.budget_matrix[0].row_id : 1;
+        const curr = rowMap.get(scopedChapterId);
+        if (curr && curr.parent_row_id && curr.parent_row_id !== rootRowId) {
+          enterChapterScope(curr.parent_row_id);
+        } else {
+          exitChapterScope();
+        }
+      });
+    }
+
+    const btnScopeClose = document.getElementById("btnScopeClose");
+    if (btnScopeClose) {
+      btnScopeClose.addEventListener("click", exitChapterScope);
+    }
+
+    const scopeCrumbs = document.getElementById("scopeBreadcrumbs");
+    if (scopeCrumbs) {
+      scopeCrumbs.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-scope-crumb]");
+        if (!btn) return;
+        const rId = Number(btn.dataset.scopeCrumb);
+        const rootRowId = (currentData && currentData.budget_matrix && currentData.budget_matrix[0]) ? currentData.budget_matrix[0].row_id : 1;
+        if (rId === rootRowId) {
+          exitChapterScope();
+        } else {
+          enterChapterScope(rId);
+        }
+      });
+    }
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && scopedChapterId) {
+        const impactModal = document.getElementById("impactModalBackdrop");
+        if (impactModal && impactModal.classList.contains("open")) return;
+        exitChapterScope();
       }
     });
 

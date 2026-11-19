@@ -143,7 +143,7 @@
             stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent)" aria-hidden="true">
             <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
           </svg>
-          <span>Mis Presupuestos .BC3 Guardados en este Dispositivo</span>
+          <span>Mis presupuestos .BC3 guardados en este dispositivo</span>
         </h2>
         <button type="button" id="btnCloseProjectsModal" class="btn-action" aria-label="Cerrar gestor de archivos">✕
           Cerrar</button>
@@ -163,7 +163,7 @@
               + Importar Archivo(s) .BC3
             </label>
             <button type="button" id="btnDuplicateActiveProject" class="btn-action">
-              ⎘ Duplicar Actual
+              Duplicar archivo actual
             </button>
           </div>
         </div>
@@ -177,7 +177,7 @@
         </div>
         <button type="button" id="btnResetFactoryProject" class="lvl-pill"
           title="Restaurar el presupuesto base original sin borrar tus otros archivos .bc3">
-          ↺ Restaurar Presupuesto Base Original
+          ↺ Restaurar archivo base original
         </button>
       </div>
     </div>
@@ -460,6 +460,35 @@
       </aside>
 
       <div id="arqmedWorkspace" class="arqmed-workspace">
+        <!-- Barra flotante de navegación de capítulo / subcapítulo -->
+        <div id="chapterScopeBanner" class="chapter-scope-banner" hidden>
+          <div class="scope-banner-nav">
+            <button type="button" id="btnScopeBack" class="scope-btn back-btn" title="Volver al nivel superior">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+              <span id="scopeBackLabel">Atrás</span>
+            </button>
+            <div id="scopeBreadcrumbs" class="scope-breadcrumbs"></div>
+          </div>
+          <div id="scopeChapterInfo" class="scope-chapter-info">
+            <span id="scopeChapterCode" class="scope-code-badge"></span>
+            <span id="scopeChapterTitle" class="scope-title-text"></span>
+            <span id="scopeChapterAmount" class="scope-amount-badge"></span>
+          </div>
+          <div class="scope-banner-actions">
+            <button type="button" id="btnScopeClose" class="scope-btn close-btn"
+              title="Cerrar vista y volver al presupuesto completo" aria-label="Cerrar">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+
         <div id="treePane" class="tree-pane" tabindex="0" aria-label="Árbol jerárquico del presupuesto">
           <table class="grid-table" id="arqmedTreeTable">
             <thead id="arqmedTreeHead">
@@ -508,18 +537,18 @@
               </div>
             </div>
             <div class="pane-body">
-              <table class="grid-table">
+              <table class="grid-table decomp-table">
                 <thead>
                   <tr>
-                    <th style="width:125px;">Código</th>
-                    <th style="width:110px;">Naturaleza</th>
-                    <th style="width:44px;">Ud</th>
-                    <th>Resumen</th>
-                    <th class="num" style="width:64px;">Factor</th>
-                    <th class="num" style="width:86px;">Rendimiento</th>
-                    <th class="num" style="width:90px;">Precio (€)</th>
-                    <th class="num" style="width:100px;">Importe (€)</th>
-                    <th class="num" style="width:68px;">Acción</th>
+                    <th style="min-width:130px;width:140px;">Código</th>
+                    <th style="min-width:115px;width:125px;">Naturaleza</th>
+                    <th style="min-width:50px;width:60px;">Ud</th>
+                    <th style="min-width:240px;">Resumen</th>
+                    <th class="num" style="min-width:90px;width:105px;">Factor</th>
+                    <th class="num" style="min-width:120px;width:135px;">Rendimiento</th>
+                    <th class="num" style="min-width:125px;width:145px;">Precio (€)</th>
+                    <th class="num" style="min-width:145px;width:170px;">Importe (€)</th>
+                    <th class="num" style="min-width:75px;width:85px;">Acción</th>
                   </tr>
                 </thead>
                 <tbody id="decompTableBody"></tbody>
@@ -569,17 +598,17 @@
                 </div>
               </div>
               <div style="flex:1;overflow:auto;">
-                <table class="grid-table">
+                <table class="grid-table meas-table">
                   <thead>
                     <tr>
-                      <th style="width:40px;">Lín.</th>
-                      <th>Comentario / Zona / Subapartado</th>
-                      <th class="num" style="width:78px;">Uds</th>
-                      <th class="num" style="width:82px;">Longitud</th>
-                      <th class="num" style="width:82px;">Anchura</th>
-                      <th class="num" style="width:82px;">Altura</th>
-                      <th class="num" style="width:94px;">Parcial</th>
-                      <th class="num" style="width:42px;">✕</th>
+                      <th style="min-width:44px;width:50px;">Lín.</th>
+                      <th style="min-width:220px;">Comentario / Zona / Subapartado</th>
+                      <th class="num" style="min-width:95px;width:115px;">Uds</th>
+                      <th class="num" style="min-width:115px;width:130px;">Longitud</th>
+                      <th class="num" style="min-width:115px;width:130px;">Anchura</th>
+                      <th class="num" style="min-width:115px;width:130px;">Altura</th>
+                      <th class="num" style="min-width:140px;width:165px;">Parcial</th>
+                      <th class="num" style="min-width:46px;width:52px;">✕</th>
                     </tr>
                   </thead>
                   <tbody id="measurementsTableBody"></tbody>
