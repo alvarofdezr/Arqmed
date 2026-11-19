@@ -1306,25 +1306,25 @@
             case "unit":
               return `
                 <td style="color:var(--text-secondary);font-family:var(--font-mono);">
-                  <span class="editable-cell" data-edit-row="${row.row_id}" title="Editar unidad">${escapeHtml(row.unit || "—")}</span>
+                  <span>${escapeHtml(row.unit || "—")}</span>
                 </td>
               `;
             case "summary":
               return `
                 <td>
-                  <span class="editable-cell" data-edit-row="${row.row_id}" title="Clic para editar este concepto con previsualización OK/NO">${escapeHtml(row.summary)}</span>
+                  <span class="tree-summary-text" title="${escapeHtml(row.summary)}">${escapeHtml(row.summary)}</span>
                 </td>
               `;
             case "qty":
               return `
                 <td class="num">
-                  <span class="editable-cell" data-edit-row="${row.row_id}" title="Editar cantidad / rendimiento">${qtyDisplay}</span>
+                  <span>${qtyDisplay}</span>
                 </td>
               `;
             case "price":
               return `
                 <td class="num">
-                  <span class="editable-cell" data-edit-row="${row.row_id}" title="Editar precio unitario (€)">${formatEuro(row.unit_price)}</span>
+                  <span>${formatEuro(row.unit_price)}</span>
                 </td>
               `;
             case "amount":
@@ -1423,19 +1423,19 @@
             <td style="font-family:var(--font-mono);font-weight:600;color:var(--accent);" title="Código BC3: ${escapeHtml(ch.code)}">${escapeHtml(formatCodeDisplay(ch.code))}</td>
             <td>${getRoleBadgeHtml(ch)}</td>
             <td style="font-family:var(--font-mono);color:var(--text-secondary);">
-              <span class="editable-cell" data-edit-row="${ch.row_id}">${escapeHtml(ch.unit || "—")}</span>
+              <span>${escapeHtml(ch.unit || "—")}</span>
             </td>
             <td>
-              <span class="editable-cell" data-edit-row="${ch.row_id}">${escapeHtml(ch.summary)}</span>
+              <span title="${escapeHtml(ch.summary)}">${escapeHtml(ch.summary)}</span>
             </td>
             <td class="num">
-              <span class="editable-cell" data-edit-row="${ch.row_id}">${formatQty(ch.factor)}</span>
+              <span>${formatQty(ch.factor)}</span>
             </td>
             <td class="num">
-              <span class="editable-cell" data-edit-row="${ch.row_id}">${formatQty(ch.yield_qty)}</span>
+              <span>${formatQty(ch.yield_qty)}</span>
             </td>
             <td class="num">
-              <span class="editable-cell" data-edit-row="${ch.row_id}">${formatEuro(ch.unit_price)}</span>
+              <span>${formatEuro(ch.unit_price)}</span>
             </td>
             <td class="num" style="font-weight:700;">${formatEuro(ch.local_amount)}</td>
             <td class="num">
@@ -2551,7 +2551,21 @@
 
       const tr = e.target.closest("tr[data-row-id]");
       if (tr) {
-        selectRow(Number(tr.dataset.rowId));
+        const rId = Number(tr.dataset.rowId);
+        const children = childrenMap.get(rId) || [];
+        const isCurrentlyExpanded = expandedRowIds.has(rId);
+        const isAlreadySelected = selectedRowId === rId;
+
+        if (children.length > 0) {
+          if (!isCurrentlyExpanded) {
+            expandedRowIds.add(rId);
+            renderArqmedTree();
+          } else if (isAlreadySelected) {
+            expandedRowIds.delete(rId);
+            renderArqmedTree();
+          }
+        }
+        selectRow(rId);
       }
     });
 
@@ -2785,8 +2799,14 @@
       if (!tr) return;
       const targetId = Number(tr.dataset.decompRow);
       const targetRow = rowMap.get(targetId);
-      if (targetRow && targetRow.parent_row_id) {
-        expandedRowIds.add(targetRow.parent_row_id);
+      if (targetRow) {
+        if (targetRow.parent_row_id) {
+          expandedRowIds.add(targetRow.parent_row_id);
+        }
+        const children = childrenMap.get(targetId) || [];
+        if (children.length > 0) {
+          expandedRowIds.add(targetId);
+        }
         renderArqmedTree();
       }
       selectRow(targetId, true);
